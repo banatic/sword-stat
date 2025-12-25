@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>플레이봇 검키우기 통계</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --text-color: #c9d1d9;
+            --accent-color: #58a6ff;
+            --border-color: #30363d;
+            --success-color: #2ea043;
+            --danger-color: #da3633;
+            --warning-color: #d29922;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #161b22;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: right;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #21262d;
+            font-weight: 600;
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        tr:hover {
+            background-color: #21262d;
+        }
+
+        .positive {
+            color: var(--success-color);
+        }
+
+        .negative {
+            color: var(--danger-color);
+        }
+
+        .neutral {
+            color: var(--warning-color);
+        }
+
+        .card {
+            background-color: #161b22;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .highlight {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        /* Tab Styles */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            color: #8b949e;
+            /* Inactive color */
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .tab-button:hover {
+            color: var(--text-color);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-button.active {
+            color: var(--accent-color);
+            border-bottom: 3px solid var(--accent-color);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>카톡 검 키우기 통계</h1>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('stats')">강화 통계</button>
+            <button class="tab-button" onclick="showTab('analysis')"> 전략 분석</button>
+        </div>
+
+        <!-- Tab 1: Stats -->
+        <div id="stats" class="tab-content active">
+            <table id="probTable">
+                <thead>
+                    <tr>
+                        <th>검 레벨</th>
+                        <th>시도 횟수</th>
+                        <th>성공률</th>
+                        <th>유지율</th>
+                        <th>파괴율</th>
+                        <th>평균 시도 비용</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Tab 2: Analysis -->
+        <div id="analysis" class="tab-content">
+            <div class="card-container" style="display: flex; gap: 20px;">
+                <div class="card" style="flex: 1;">
+                    <h3>최고 수익 구간</h3>
+                    <div id="recommendation-profit" class="highlight">분석 중...</div>
+                </div>
+                <div class="card" style="flex: 1;">
+                    <h3>시간 대비 최고 효율</h3>
+                    <div id="recommendation-time" class="highlight">분석 중...</div>
+                </div>
+            </div>
+
+            <div style="margin: 20px 0; display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
+                <label for="sigmaInput">안전 자산 기준 (σ):</label>
+                <input type="number" id="sigmaInput" value="2" step="0.1" min="0" max="6"
+                    style="padding: 5px; width: 60px; background: #21262d; color: white; border: 1px solid #30363d; border-radius: 4px;">
+                <span style="color: #8b949e; font-size: 0.9em;">(상위 <span id="sigmaProb">97.7</span>% 커버)</span>
+            </div>
+
+            <table id="analysisTable">
+                <thead>
+                    <tr>
+                        <th>검 레벨</th>
+                        <th title="평균 제작 비용">제작 비용 (E)</th>
+                        <th>평균 판매가</th>
+                        <th>예상 수익</th>
+                        <th title="예상 수익 / 평균 시도 횟수">시간 효율 (G/회)</th>
+                        <th title="설정된 시그마 확률로 이 비용 안에는 성공함 (평균 + Nσ)">안전 자산 (<span id="sigmaLabel">2</span>σ)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script>
+        const sigmaInput = document.getElementById('sigmaInput');
+        const sigmaLabel = document.getElementById('sigmaLabel');
+        const sigmaProb = document.getElementById('sigmaProb');
+
+        // Tab Switching
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+
+            // Find button that calls this function (approximate)
+            const buttons = document.querySelectorAll('.tab-button');
+            if (tabId === 'stats') buttons[0].classList.add('active');
+            if (tabId === 'analysis') buttons[1].classList.add('active');
+        }
+
+        // CDF 분포
+        function normalCDF(x) {
+            var t = 1 / (1 + .2316419 * Math.abs(x));
+            var d = .3989423 * Math.exp(-x * x / 2);
+            var prob = d * t * (.3193815 + t * (-.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+            if (x > 0) prob = 1 - prob;
+            return prob;
+        }
+
+        function updateSigmaDisplay() {
+            const val = parseFloat(sigmaInput.value);
+            if (sigmaLabel) sigmaLabel.textContent = val;
+
+            if (sigmaProb) {
+                const prob = normalCDF(val);
+                sigmaProb.textContent = (prob * 100).toFixed(1);
+            }
+            loadData();
+        }
+
+        if (sigmaInput) {
+            sigmaInput.addEventListener('input', updateSigmaDisplay);
+        }
+
+        function loadData() {
+            try {
+                if (typeof swordData === 'undefined') {
+                    throw new Error("data.js not loaded or swordData undefined");
+                }
+                const data = swordData;
+                const sigma = sigmaInput ? parseFloat(sigmaInput.value) : 2.0;
+
+                const probBody = document.querySelector('#probTable tbody');
+                const analysisBody = document.querySelector('#analysisTable tbody');
+
+                if (probBody) probBody.innerHTML = "";
+                if (analysisBody) analysisBody.innerHTML = "";
+
+                let maxProfit = -Infinity;
+                let maxTimeEff = -Infinity;
+                let bestLevelProfit = 0;
+                let bestLevelTime = 0;
+
+                data.forEach(row => {
+                    if (row.expected_profit > maxProfit) {
+                        maxProfit = row.expected_profit;
+                        bestLevelProfit = row.level;
+                    }
+                    if (row.time_efficiency > maxTimeEff) {
+                        maxTimeEff = row.time_efficiency;
+                        bestLevelTime = row.level;
+                    }
+                });
+
+                data.forEach(row => {
+                    // Populate Probability Table
+                    if (probBody) {
+                        const trProb = document.createElement('tr');
+                        trProb.innerHTML = `
+                            <td style="text-align: center; font-weight: bold;">+${row.level}</td>
+                            <td>${row.attempts}</td>
+                            <td class="positive">${row.prob_success}%</td>
+                            <td class="neutral">${row.prob_maintain}%</td>
+                            <td class="negative">${row.prob_destroy}%</td>
+                            <td>${row.avg_attempt_cost.toLocaleString()} G</td>
+                        `;
+                        probBody.appendChild(trProb);
+                    }
+
+                    // Populate Analysis Table
+                    if (analysisBody) {
+                        const trAnalysis = document.createElement('tr');
+                        const profitClass = row.expected_profit > 0 ? 'positive' : (row.expected_profit < 0 ? 'negative' : 'neutral');
+
+                        if (row.level === bestLevelProfit) trAnalysis.style.backgroundColor = 'rgba(46, 160, 67, 0.15)';
+                        if (row.level === bestLevelTime) {
+                            if (row.level === bestLevelProfit) {
+                                trAnalysis.style.background = 'linear-gradient(90deg, rgba(46, 160, 67, 0.15) 50%, rgba(88, 166, 255, 0.15) 50%)';
+                            } else {
+                                trAnalysis.style.backgroundColor = 'rgba(88, 166, 255, 0.15)';
+                            }
+                        }
+
+                        const safetyCap = row.cost_to_reach + (sigma * row.sigma_cost);
+
+                        trAnalysis.innerHTML = `
+                            <td style="text-align: center; font-weight: bold;">+${row.level}</td>
+                            <td>${row.cost_to_reach.toLocaleString()} G</td>
+                            <td>${row.avg_sell_price.toLocaleString()} G</td>
+                            <td class="${profitClass}" style="font-weight: bold;">${row.expected_profit.toLocaleString()} G</td>
+                            <td style="font-weight: bold; color: #58a6ff;">${row.time_efficiency.toLocaleString()}</td>
+                            <td style="color: #d2a8ff;">${safetyCap.toLocaleString()} G</td>
+                        `;
+                        analysisBody.appendChild(trAnalysis);
+                    }
+                });
+
+                const recProfit = document.getElementById('recommendation-profit');
+                const recTime = document.getElementById('recommendation-time');
+
+                if (recProfit) {
+                    if (maxProfit > -Infinity) {
+                        recProfit.innerHTML = `+${bestLevelProfit}강 판매<br><span style="font-size:0.6em; color:#aaa">예상 수익: ${maxProfit.toLocaleString()} G</span>`;
+                    } else {
+                        recProfit.innerHTML = "데이터 부족";
+                    }
+                }
+
+                if (recTime) {
+                    if (maxTimeEff > -Infinity) {
+                        recTime.innerHTML = `+${bestLevelTime}강 판매<br><span style="font-size:0.6em; color:#aaa">효율: ${maxTimeEff.toLocaleString()} G/회</span>`;
+                    } else {
+                        recTime.innerHTML = "데이터 부족";
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                const recProfit = document.getElementById('recommendation-profit');
+                if (recProfit) recProfit.innerHTML = "데이터 로드 실패";
+            }
+        }
+
+        updateSigmaDisplay();
+    </script>
+</body>
+
+</html>
