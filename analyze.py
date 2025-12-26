@@ -1,17 +1,13 @@
 import re
 import json
 import os
-from collections import defaultdict
+from collections import defaultdict, deque
 
+import tqdm
 import glob
 
-STAT_DIR = "statistic"
-DATA_FILE = os.path.join(STAT_DIR, "data.json")
 
-import glob
-from collections import deque
-
-STAT_DIR = "statistic"
+STAT_DIR = ""
 DATA_FILE = os.path.join(STAT_DIR, "data.json")
 
 
@@ -138,34 +134,32 @@ def analyze():
 
         # 3.1 Destruction
         if "산산조각 나서" in chat:
-            src_level = re.search(r'『\[\+(\d+)\]', chat)
-            src_level = int(level.replace("+", ""))
-            stats[src_level]['attempts'] += 1
-            stats[src_level]['destroy'] += 1
-            stats[src_level]['total_cost'] += 강화비용[src_level]
+            src_level_match = re.search(r'『\[\+(\d+)\]', chat)
+            if src_level_match:
+                src_level = int(src_level_match.group(1))
+                stats[src_level]['attempts'] += 1
+                stats[src_level]['destroy'] += 1
+                stats[src_level]['total_cost'] += 강화비용[src_level]
 
         # 4. Sell
         if "검 판매" in chat:
-            src_level = re.search(r"자네의 '\[\+(\d+)\]", chat)
-            src_level = int(src_level.group(1))
+            src_level_match = re.search(r"자네의 '\[\+(\d+)\]", chat)
+            if src_level_match:
+                src_level = int(src_level_match.group(1))
 
-            if src_level == 3:
-                print(f"{src_level} gain_gold: {gain_gold}")
-                print(chat)
-                
-            # 💶획득 골드: +76,615G
-            gain_gold_match = re.search(r'획득 골드: \+([\d,]+)G', chat)
-            # 💰현재 보유 골드: 11,952,477G
-            gold_match = re.search(r'현재 보유 골드: ([\d,]+)G', chat)
-    
-            gain_gold = gain_gold_match.group(1) if gain_gold_match else "0"
-            gold = gold_match.group(1) if gold_match else "0"
+                # 💶획득 골드: +76,615G
+                gain_gold_match = re.search(r'획득 골드: \+([\d,]+)G', chat)
+                # 💰현재 보유 골드: 11,952,477G
+                gold_match = re.search(r'현재 보유 골드: ([\d,]+)G', chat)
+        
+                gain_gold = gain_gold_match.group(1) if gain_gold_match else "0"
+                gold = gold_match.group(1) if gold_match else "0"
 
-            gain_gold = int(gain_gold.replace(",", ""))
-            gold = int(gold.replace(",", ""))
-    
-            stats[src_level]['sell_count'] += 1
-            stats[src_level]['sell_total'] += gain_gold
+                gain_gold = int(gain_gold.replace(",", ""))
+                gold = int(gold.replace(",", ""))
+        
+                stats[src_level]['sell_count'] += 1
+                stats[src_level]['sell_total'] += gain_gold
 
 
     sorted_levels = sorted(stats.keys())
@@ -227,9 +221,8 @@ def analyze():
         import random
         import math
         
-        SIM_RUNS = 2000 
+        SIM_RUNS = 50000
         
-
         def simulate_run(target_lvl):
             curr_lvl = 0
             total_c = 0
@@ -265,7 +258,7 @@ def analyze():
                     break
             
             if can_sim and analyze.level_probs[lvl-1]['s'] > 0:
-                for _ in range(SIM_RUNS):
+                for _ in tqdm.tqdm(range(SIM_RUNS)):
                     sc, sa = simulate_run(lvl)
                     if sc is not None:
                         sim_costs.append(sc)
