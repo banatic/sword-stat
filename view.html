@@ -157,11 +157,15 @@
                     <tr>
                         <th>검 레벨</th>
                         <th>시도 횟수</th>
+                        <th>성공 횟수</th>
                         <th>성공률</th>
+                        <th>유지 횟수</th>
                         <th>유지율</th>
+                        <th>파괴 횟수</th>
                         <th>파괴율</th>
                         <th>평균 시도 비용</th>
                         <th>누적 확률</th>
+                        <th>순수 성공 확률</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -197,7 +201,8 @@
                         <th>예상 수익</th>
                         <th title="예상 수익 / 평균 시도 횟수">시간 효율 (G/회)</th>
                         <th title="설정된 시그마 확률로 이 비용 안에는 성공함 (평균 + Nσ)">안전 자산 (<span id="sigmaLabel">2</span>σ)</th>
-                        <th title="0강에서 해당 레벨까지 성공할 확률">누적 확률</th>
+                        <th title="0강에서 해당 레벨까지 성공할 확률 (유지 고려)">누적 확률</th>
+                        <th title="0강에서 해당 레벨까지 유지 없이 순수하게 성공만으로 도달할 확률">순수 성공 확률</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -284,14 +289,20 @@
                         const trProb = document.createElement('tr');
                         const cumProb = row.cumulative_prob !== undefined ? row.cumulative_prob : 0;
                         const cumProbFormatted = cumProb < 0.0001 ? cumProb.toExponential(2) : cumProb.toFixed(4);
+                        const pureProb = row.pure_success_prob !== undefined ? row.pure_success_prob : 0;
+                        const pureProbFormatted = pureProb < 0.0001 ? pureProb.toExponential(2) : pureProb.toFixed(4);
                         trProb.innerHTML = `
                             <td style="text-align: center; font-weight: bold;">+${row.level}</td>
-                            <td>${row.attempts}</td>
+                            <td>${row.attempts.toLocaleString()}</td>
+                            <td class="positive">${row.success.toLocaleString()}</td>
                             <td class="positive">${row.prob_success}%</td>
+                            <td class="neutral">${row.maintain.toLocaleString()}</td>
                             <td class="neutral">${row.prob_maintain}%</td>
+                            <td class="negative">${row.destroy.toLocaleString()}</td>
                             <td class="negative">${row.prob_destroy}%</td>
                             <td>${row.avg_attempt_cost.toLocaleString()} G</td>
-                            <td style="color: #58a6ff; font-weight: bold;" title="0강에서 ${row.level}강까지 성공할 확률">${cumProbFormatted}%</td>
+                            <td style="color: #58a6ff; font-weight: bold;" title="0강에서 ${row.level}강까지 성공할 확률 (유지 고려)">${cumProbFormatted}%</td>
+                            <td style="color: #2ea043; font-weight: bold;" title="0강에서 ${row.level}강까지 유지 없이 순수하게 성공만으로 도달할 확률">${pureProbFormatted}%</td>
                         `;
                         probBody.appendChild(trProb);
                     }
@@ -313,6 +324,8 @@
                         const safetyCap = row.cost_to_reach + (sigma * row.sigma_cost);
                         const cumProb = row.cumulative_prob !== undefined ? row.cumulative_prob : 0;
                         const cumProbFormatted = cumProb < 0.0001 ? cumProb.toExponential(2) : cumProb.toFixed(4);
+                        const pureProb = row.pure_success_prob !== undefined ? row.pure_success_prob : 0;
+                        const pureProbFormatted = pureProb < 0.0001 ? pureProb.toExponential(2) : pureProb.toFixed(4);
 
                         trAnalysis.innerHTML = `
                             <td style="text-align: center; font-weight: bold;">+${row.level}</td>
@@ -322,6 +335,7 @@
                             <td style="font-weight: bold; color: #58a6ff;">${row.time_efficiency.toLocaleString()}</td>
                             <td style="color: #d2a8ff;">${safetyCap.toLocaleString()} G</td>
                             <td style="color: #58a6ff; font-weight: bold;">${cumProbFormatted}%</td>
+                            <td style="color: #2ea043; font-weight: bold;">${pureProbFormatted}%</td>
                         `;
                         analysisBody.appendChild(trAnalysis);
                     }

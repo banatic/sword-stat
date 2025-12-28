@@ -198,8 +198,9 @@ def analyze():
     max_level = sorted_levels[-1]
     cost_to_reach = {0: 0} 
     
-    # 누적 확률 계산을 위한 성공 확률 저장
+    # 누적 확률 계산을 위한 성공 확률 및 유지 확률 저장
     level_success_probs = {}
+    level_maintain_probs = {}
     
     analysis_out = []
 
@@ -219,8 +220,9 @@ def analyze():
         p_m = m / total
         p_d = d / total
         
-        # 누적 확률 계산을 위해 성공 확률 저장
+        # 누적 확률 계산을 위해 성공 확률 및 유지 확률 저장
         level_success_probs[lvl] = p_s
+        level_maintain_probs[lvl] = p_m
         
         avg_cost = data['total_cost'] / total
         
@@ -318,11 +320,32 @@ def analyze():
             mean_attempts = 0
             time_efficiency = 0
 
-        # 누적 확률 계산: 0강에서 현재 레벨까지 도달할 확률
+        # 순수 성공 확률: 각 단계에서 성공 확률만 곱한 값 (유지, 파괴 무시, 한 번에 연속 성공 확률)
+        pure_success_prob = 1.0
+        for prev_lvl in range(lvl):
+            if prev_lvl in level_success_probs:
+                pure_success_prob *= level_success_probs[prev_lvl]
+            else:
+                pure_success_prob = 0.0
+                break
+
+        # 누적 확률: 유지를 고려한 실제 도달 확률
+        # 유지가 발생해도 다시 시도할 수 있으므로, 각 단계에서 성공할 확률을 곱함
+        # 각 단계에서 성공할 확률 = 성공 확률 / (1 - 유지 확률)
+        # 이는 유지가 발생해도 다시 시도할 수 있으므로, 유지를 제외한 확률로 정규화
         cumulative_prob = 1.0
         for prev_lvl in range(lvl):
             if prev_lvl in level_success_probs:
-                cumulative_prob *= level_success_probs[prev_lvl]
+                p_s_prev = level_success_probs[prev_lvl]
+                p_m_prev = level_maintain_probs.get(prev_lvl, 0)
+                # 유지를 고려한 실제 성공 확률
+                # 유지가 발생해도 다시 시도할 수 있으므로, 유지를 제외한 확률로 정규화
+                # 성공 확률 / (성공 확률 + 파괴 확률) = 성공 확률 / (1 - 유지 확률)
+                if p_m_prev < 1.0:  # 유지 확률이 1이 아닌 경우만
+                    adjusted_success_prob = p_s_prev / (1.0 - p_m_prev)
+                else:
+                    adjusted_success_prob = 0.0
+                cumulative_prob *= adjusted_success_prob
             else:
                 cumulative_prob = 0.0
                 break
@@ -343,7 +366,8 @@ def analyze():
             "sigma_cost": int(std_dev_cost),
             "mean_attempts": int(mean_attempts),
             "time_efficiency": int(time_efficiency),
-            "cumulative_prob": round(cumulative_prob * 100, 6)  # 백분율로 저장
+            "cumulative_prob": round(cumulative_prob * 100, 6),  # 백분율로 저장
+            "pure_success_prob": round(pure_success_prob * 100, 6)  # 유지 무시 순수 성공 확률
         }
         analysis_out.append(row)
 

@@ -15,7 +15,8 @@ const swordData = [
         "sigma_cost": 0,
         "mean_attempts": 0,
         "time_efficiency": 0,
-        "cumulative_prob": 100.0
+        "cumulative_prob": 100.0,
+        "pure_success_prob": 100.0
     },
     {
         "level": 1,
@@ -33,7 +34,8 @@ const swordData = [
         "sigma_cost": 0,
         "mean_attempts": 1,
         "time_efficiency": 10,
-        "cumulative_prob": 100.0
+        "cumulative_prob": 100.0,
+        "pure_success_prob": 100.0
     },
     {
         "level": 2,
@@ -51,7 +53,8 @@ const swordData = [
         "sigma_cost": 3,
         "mean_attempts": 2,
         "time_efficiency": 9,
-        "cumulative_prob": 89.84958
+        "cumulative_prob": 100.0,
+        "pure_success_prob": 89.84958
     },
     {
         "level": 3,
@@ -66,10 +69,11 @@ const swordData = [
         "avg_sell_price": 101,
         "cost_to_reach": 36,
         "expected_profit": 64,
-        "sigma_cost": 12,
+        "sigma_cost": 11,
         "mean_attempts": 3,
         "time_efficiency": 19,
-        "cumulative_prob": 71.240972
+        "cumulative_prob": 100.0,
+        "pure_success_prob": 71.240972
     },
     {
         "level": 4,
@@ -84,10 +88,11 @@ const swordData = [
         "avg_sell_price": 317,
         "cost_to_reach": 108,
         "expected_profit": 209,
-        "sigma_cost": 43,
+        "sigma_cost": 42,
         "mean_attempts": 4,
         "time_efficiency": 42,
-        "cumulative_prob": 50.069416
+        "cumulative_prob": 97.277778,
+        "pure_success_prob": 50.069416
     },
     {
         "level": 5,
@@ -102,10 +107,11 @@ const swordData = [
         "avg_sell_price": 726,
         "cost_to_reach": 285,
         "expected_profit": 441,
-        "sigma_cost": 133,
+        "sigma_cost": 132,
         "mean_attempts": 6,
         "time_efficiency": 63,
-        "cumulative_prob": 29.897511
+        "cumulative_prob": 89.646824,
+        "pure_success_prob": 29.897511
     },
     {
         "level": 6,
@@ -122,8 +128,9 @@ const swordData = [
         "expected_profit": 2606,
         "sigma_cost": 407,
         "mean_attempts": 10,
-        "time_efficiency": 253,
-        "cumulative_prob": 14.904039
+        "time_efficiency": 252,
+        "cumulative_prob": 75.348093,
+        "pure_success_prob": 14.904039
     },
     {
         "level": 7,
@@ -138,10 +145,11 @@ const swordData = [
         "avg_sell_price": 6127,
         "cost_to_reach": 2020,
         "expected_profit": 4106,
-        "sigma_cost": 1176,
+        "sigma_cost": 1177,
         "mean_attempts": 14,
         "time_efficiency": 276,
-        "cumulative_prob": 6.679977
+        "cumulative_prob": 61.661841,
+        "pure_success_prob": 6.679977
     },
     {
         "level": 8,
@@ -156,10 +164,11 @@ const swordData = [
         "avg_sell_price": 16000,
         "cost_to_reach": 5048,
         "expected_profit": 10952,
-        "sigma_cost": 3063,
+        "sigma_cost": 3059,
         "mean_attempts": 21,
         "time_efficiency": 520,
-        "cumulative_prob": 2.634698
+        "cumulative_prob": 49.575528,
+        "pure_success_prob": 2.634698
     },
     {
         "level": 9,
@@ -174,10 +183,11 @@ const swordData = [
         "avg_sell_price": 50691,
         "cost_to_reach": 12148,
         "expected_profit": 38542,
-        "sigma_cost": 7633,
+        "sigma_cost": 7675,
         "mean_attempts": 29,
-        "time_efficiency": 1290,
-        "cumulative_prob": 0.93061
+        "time_efficiency": 1295,
+        "cumulative_prob": 38.586783,
+        "pure_success_prob": 0.93061
     },
     {
         "level": 10,
@@ -192,10 +202,11 @@ const swordData = [
         "avg_sell_price": 106651,
         "cost_to_reach": 32232,
         "expected_profit": 74418,
-        "sigma_cost": 21066,
+        "sigma_cost": 21037,
         "mean_attempts": 42,
-        "time_efficiency": 1747,
-        "cumulative_prob": 0.287158
+        "time_efficiency": 1750,
+        "cumulative_prob": 29.244962,
+        "pure_success_prob": 0.287158
     },
     {
         "level": 11,
@@ -210,10 +221,11 @@ const swordData = [
         "avg_sell_price": 235861,
         "cost_to_reach": 84579,
         "expected_profit": 151281,
-        "sigma_cost": 58758,
-        "mean_attempts": 64,
-        "time_efficiency": 2358,
-        "cumulative_prob": 0.073035
+        "sigma_cost": 57865,
+        "mean_attempts": 63,
+        "time_efficiency": 2382,
+        "cumulative_prob": 20.826545,
+        "pure_success_prob": 0.073035
     },
     {
         "level": 12,
@@ -228,10 +240,11 @@ const swordData = [
         "avg_sell_price": 486968,
         "cost_to_reach": 204212,
         "expected_profit": 282755,
-        "sigma_cost": 140105,
+        "sigma_cost": 140059,
         "mean_attempts": 90,
         "time_efficiency": 3120,
-        "cumulative_prob": 0.016291
+        "cumulative_prob": 15.377921,
+        "pure_success_prob": 0.016291
     },
     {
         "level": 13,
@@ -246,10 +259,11 @@ const swordData = [
         "avg_sell_price": 1392751,
         "cost_to_reach": 450638,
         "expected_profit": 942113,
-        "sigma_cost": 323816,
+        "sigma_cost": 323784,
         "mean_attempts": 138,
-        "time_efficiency": 6818,
-        "cumulative_prob": 0.003244
+        "time_efficiency": 6782,
+        "cumulative_prob": 10.469008,
+        "pure_success_prob": 0.003244
     },
     {
         "level": 14,
@@ -264,10 +278,11 @@ const swordData = [
         "avg_sell_price": 3427387,
         "cost_to_reach": 971155,
         "expected_profit": 2456232,
-        "sigma_cost": 752332,
+        "sigma_cost": 750324,
         "mean_attempts": 233,
-        "time_efficiency": 10516,
-        "cumulative_prob": 0.000558
+        "time_efficiency": 10536,
+        "cumulative_prob": 6.38866,
+        "pure_success_prob": 0.000558
     },
     {
         "level": 15,
@@ -282,10 +297,11 @@ const swordData = [
         "avg_sell_price": 5690418,
         "cost_to_reach": 2039086,
         "expected_profit": 3651331,
-        "sigma_cost": 1667039,
-        "mean_attempts": 408,
-        "time_efficiency": 8938,
-        "cumulative_prob": 7.5e-05
+        "sigma_cost": 1681202,
+        "mean_attempts": 407,
+        "time_efficiency": 8953,
+        "cumulative_prob": 3.720304,
+        "pure_success_prob": 7.5e-05
     },
     {
         "level": 16,
@@ -300,10 +316,11 @@ const swordData = [
         "avg_sell_price": 11098656,
         "cost_to_reach": 4470833,
         "expected_profit": 6627822,
-        "sigma_cost": 3831989,
-        "mean_attempts": 768,
-        "time_efficiency": 8621,
-        "cumulative_prob": 8e-06
+        "sigma_cost": 3830086,
+        "mean_attempts": 766,
+        "time_efficiency": 8652,
+        "cumulative_prob": 1.994083,
+        "pure_success_prob": 8e-06
     },
     {
         "level": 17,
@@ -318,10 +335,11 @@ const swordData = [
         "avg_sell_price": 22345454,
         "cost_to_reach": 10054834,
         "expected_profit": 12290620,
-        "sigma_cost": 9018611,
-        "mean_attempts": 1535,
-        "time_efficiency": 8003,
-        "cumulative_prob": 1e-06
+        "sigma_cost": 8903458,
+        "mean_attempts": 1522,
+        "time_efficiency": 8072,
+        "cumulative_prob": 1.017389,
+        "pure_success_prob": 1e-06
     },
     {
         "level": 18,
@@ -336,9 +354,10 @@ const swordData = [
         "avg_sell_price": 57567727,
         "cost_to_reach": 19658701,
         "expected_profit": 37909026,
-        "sigma_cost": 17912082,
-        "mean_attempts": 2761,
-        "time_efficiency": 13729,
-        "cumulative_prob": 0.0
+        "sigma_cost": 17717641,
+        "mean_attempts": 2743,
+        "time_efficiency": 13815,
+        "cumulative_prob": 0.565216,
+        "pure_success_prob": 0.0
     }
 ];
