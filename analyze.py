@@ -95,15 +95,30 @@ def analyze():
             gold_match = re.search(r'남은 골드: ([\d,]+)G', chat)
             sword_match = re.search(r'획득 검: \[(\+\d+)\] (.+)', chat)
 
+            if not sword_match:
+                continue
+                
             used_gold = used_gold_match.group(1) if used_gold_match else None
             gold = gold_match.group(1) if gold_match else None
             level = sword_match.group(1)
             sword_name = sword_match.group(2)
-            sword_name = sword_name.replace("』", "")
             
-            used_gold = int(used_gold.replace(",", ""))
-            gold = int(gold.replace(",", ""))
+            if sword_name:
+                sword_name = sword_name.replace("』", "")
             
+            if used_gold:
+                used_gold = int(used_gold.replace(",", ""))
+            else:
+                used_gold = 0
+                
+            if gold:
+                gold = int(gold.replace(",", ""))
+            else:
+                gold = 0
+            
+            if not level:
+                continue
+                
             src_level = int(level.replace("+", ""))
 
             stats[src_level-1]['attempts'] += 1
@@ -116,16 +131,30 @@ def analyze():
             gold_match = re.search(r'남은 골드: ([\d,]+)G', chat)
             sword_match = re.search(r'\[(\+\d+)\] (.+)의 레벨이 유지되었습니다.', chat)
 
+            if not sword_match:
+                continue
+
             used_gold = used_gold_match.group(1) if used_gold_match else None
             gold = gold_match.group(1) if gold_match else None
             level = sword_match.group(1)  
             sword_name = sword_match.group(2) 
 
-            sword_name = sword_name.replace("』", "")
+            if sword_name:
+                sword_name = sword_name.replace("』", "")
 
-            used_gold = int(used_gold.replace(",", ""))
-            gold = int(gold.replace(",", ""))
+            if used_gold:
+                used_gold = int(used_gold.replace(",", ""))
+            else:
+                used_gold = 0
+                
+            if gold:
+                gold = int(gold.replace(",", ""))
+            else:
+                gold = 0
     
+            if not level:
+                continue
+                
             src_level = int(level.replace("+", ""))
 
             stats[src_level]['attempts'] += 1
@@ -169,6 +198,9 @@ def analyze():
     max_level = sorted_levels[-1]
     cost_to_reach = {0: 0} 
     
+    # 누적 확률 계산을 위한 성공 확률 저장
+    level_success_probs = {}
+    
     analysis_out = []
 
     for lvl in range(max_level + 1):
@@ -187,13 +219,18 @@ def analyze():
         p_m = m / total
         p_d = d / total
         
+        # 누적 확률 계산을 위해 성공 확률 저장
+        level_success_probs[lvl] = p_s
+        
         avg_cost = data['total_cost'] / total
         
         avg_sell = 0
 
         if data['sell_count'] > 0:
             avg_sell = data['sell_total'] / data['sell_count']
+
             
+
         # Recursive Calculation
         prev_cum_cost = cost_to_reach.get(lvl, 0)
         
@@ -281,6 +318,14 @@ def analyze():
             mean_attempts = 0
             time_efficiency = 0
 
+        # 누적 확률 계산: 0강에서 현재 레벨까지 도달할 확률
+        cumulative_prob = 1.0
+        for prev_lvl in range(lvl):
+            if prev_lvl in level_success_probs:
+                cumulative_prob *= level_success_probs[prev_lvl]
+            else:
+                cumulative_prob = 0.0
+                break
 
         row = {
             "level": lvl,
@@ -297,7 +342,8 @@ def analyze():
             "expected_profit": int(expected_profit),
             "sigma_cost": int(std_dev_cost),
             "mean_attempts": int(mean_attempts),
-            "time_efficiency": int(time_efficiency)
+            "time_efficiency": int(time_efficiency),
+            "cumulative_prob": round(cumulative_prob * 100, 6)  # 백분율로 저장
         }
         analysis_out.append(row)
 
